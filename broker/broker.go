@@ -50,6 +50,7 @@ func (broker *Broker) Process() {
 	poller.Add(broker.socket, zmq.POLLIN)
 
 	for {
+		fmt.Println("Polling...")
 		incoming_sockets, err := poller.Poll(POLL_FREQUENCY)
 		if err != nil {
 			fmt.Println(err)

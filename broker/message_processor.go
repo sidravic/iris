@@ -3,6 +3,7 @@ package broker
 import (
 	"fmt"
 	"github.com/supersid/iris/service"
+	"github.com/supersid/iris/client"
 )
 
 /*
@@ -45,6 +46,9 @@ func (broker *Broker) ParseMessage(msg []string) Message {
 }
 
 func (broker *Broker) ProcessMessage(msg Message) {
+	fmt.Println("==============================")
+	fmt.Println(msg)
+	fmt.Println("==============================")
 	if msg.command == WORKER_READY {
 		new_service := broker.FindOrCreateService(msg.service_name)
 		worker_existed, service_worker := new_service.FindOrCreateServiceWorker(msg.identity, msg.sender)
@@ -60,7 +64,10 @@ func (broker *Broker) ProcessMessage(msg Message) {
 		for index, w := range new_service.GetWaitingWorkers() {
 			fmt.Println(fmt.Sprintf("%d. %s", index, w.GetIdentity()))
 		}
+	} else if msg.command == client.CLIENT_REQUEST {
+		fmt.Println("Client Request arrived.")
 	}
+
 }
 
 func (broker *Broker) FindOrCreateService(service_name string) (*service.Service) {
