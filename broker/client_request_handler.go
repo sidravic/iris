@@ -19,10 +19,3 @@ func(broker *Broker) ClientRequestHandler(msg message.Message){
 	new_service.AddRequest(msg)
 	new_service.ProcessRequests()
 }
-
-
-//func (broker *Broker) AddRequestToService(msg Message){
-//	srvc, _ := broker.FindOrCreateService(msg.service_name)
-//
-//	srvc.AddToWaitingWorkers()
-//}

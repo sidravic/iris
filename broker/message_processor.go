@@ -15,14 +15,6 @@ It's just an slice of strings.
 
 const WORKER_READY string = "WORKER_READY"
 
-//type Message struct {
-//	sender       string
-//	command      string
-//	identity     string
-//	data         string
-//	service_name string
-//}
-
 func (broker *Broker) ParseMessage(msg []string) message.Message {
 	var m message.Message
 	for index, message := range msg {
@@ -49,9 +41,6 @@ func (broker *Broker) ParseMessage(msg []string) message.Message {
 }
 
 func (broker *Broker) ProcessMessage(msg message.Message) {
-	fmt.Println("==============================")
-	fmt.Println(msg)
-	fmt.Println("==============================")
 	if msg.Command == WORKER_READY {
 		broker.WorkerReadyHandler(msg)
 	} else if msg.Command == client.CLIENT_REQUEST {
