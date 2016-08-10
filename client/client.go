@@ -54,8 +54,8 @@ func (client *Client) createMessage(service_name, message string) []string {
 	msg := make([]string, 5)
 	msg[0] = ""
 	msg[1] = CLIENT_REQUEST
-	msg[2] = ""
-	msg[3] = service_name
+	msg[2] = service_name
+	msg[3] = client.identity
 	msg[4] = message
 
 	return msg

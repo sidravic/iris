@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/supersid/iris/service"
 	"github.com/supersid/iris/client"
+	"github.com/supersid/iris/message"
+	"github.com/satori/go.uuid"
 )
 
 /*
@@ -13,71 +15,58 @@ It's just an slice of strings.
 
 const WORKER_READY string = "WORKER_READY"
 
-type Message struct {
-	sender       string
-	command      string
-	identity     string
-	data         string
-	service_name string
-}
+//type Message struct {
+//	sender       string
+//	command      string
+//	identity     string
+//	data         string
+//	service_name string
+//}
 
-func (broker *Broker) ParseMessage(msg []string) Message {
-	var message Message
+func (broker *Broker) ParseMessage(msg []string) message.Message {
+	var m message.Message
 	for index, message := range msg {
 		fmt.Println(fmt.Sprintf("%d. %s", index, message))
 	}
 
 	command := msg[2]
-	sender := msg[0]
+	sender  := msg[0]
 
-	if command == WORKER_READY {
-		message = Message{
-			sender:       sender,
-			command:      command,
-			identity:     msg[4],
-			service_name: msg[3],
-			data:         "",
+	if command == WORKER_READY || command == client.CLIENT_REQUEST{
+		m = message.Message{
+			Sender:       sender,
+			Command:      command,
+			Identity:     msg[4],
+			ServiceName:  msg[3],
+			Data:         msg[5],
+			MessageId:    uuid.NewV4().String(),
 		}
 	} else {
-		message = Message{}
+		m = message.Message{}
 	}
 
-	return message
+	return m
 }
 
-func (broker *Broker) ProcessMessage(msg Message) {
+func (broker *Broker) ProcessMessage(msg message.Message) {
 	fmt.Println("==============================")
 	fmt.Println(msg)
 	fmt.Println("==============================")
-	if msg.command == WORKER_READY {
-		new_service := broker.FindOrCreateService(msg.service_name)
-		worker_existed, service_worker := new_service.FindOrCreateServiceWorker(msg.identity, msg.sender)
-
-		if !worker_existed {
-			fmt.Println("Adding service worker")
-			new_service.AddWorker(service_worker)
-		}
-
-		fmt.Println("Service after workers are added")
-
-		fmt.Println(len(new_service.GetWaitingWorkers()))
-		for index, w := range new_service.GetWaitingWorkers() {
-			fmt.Println(fmt.Sprintf("%d. %s", index, w.GetIdentity()))
-		}
-	} else if msg.command == client.CLIENT_REQUEST {
+	if msg.Command == WORKER_READY {
+		broker.WorkerReadyHandler(msg)
+	} else if msg.Command == client.CLIENT_REQUEST {
 		fmt.Println("Client Request arrived.")
+		broker.ClientRequestHandler(msg)
 	}
 
 }
 
-func (broker *Broker) FindOrCreateService(service_name string) (*service.Service) {
+func (broker *Broker) FindOrCreateService(service_name string) (*service.Service, bool) {
 	srvc, present := broker.services[service_name]
 
 	if !present {
 		srvc = service.NewService(service_name)
-		broker.services[service_name] = srvc
-		broker.services_list = append(broker.services_list, srvc)
 	}
 
-	return srvc
+	return srvc, present
 }

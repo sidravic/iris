@@ -6,6 +6,7 @@ import (
 	zmq "github.com/pebbe/zmq4"
 	"time"
 	"fmt"
+	"github.com/supersid/iris/message"
 )
 
 const POLL_FREQUENCY = 250 * time.Millisecond
@@ -15,7 +16,7 @@ type Broker struct {
 	socket          *zmq.Socket
 	broker_url      string
 	services        map[string]*service.Service
-	workers         map[string]*worker.Worker
+	workers         map[string]*service.ServiceWorker
 	services_list   []*service.Service
 	waiting_workers []*worker.Worker
 }
@@ -23,11 +24,11 @@ type Broker struct {
 /*
  Creates a new broker by initialising a new ROUTER socket
  */
-func newBroker(broker_url string) (*Broker, error) {
+func NewBroker(broker_url string) (*Broker, error) {
 	broker := &Broker{
 		broker_url:      broker_url,
 		services:        make(map[string]*service.Service),
-		workers:         make(map[string]*worker.Worker),
+		workers:         make(map[string]*service.ServiceWorker),
 		waiting_workers: make([]*worker.Worker,0),
 	}
 
@@ -58,16 +59,22 @@ func (broker *Broker) Process() {
 
 		if len(incoming_sockets) > 0 {
 			msg, _ := broker.socket.RecvMessage(0)
-			var message Message = broker.ParseMessage(msg)
+			var message message.Message = broker.ParseMessage(msg)
 			fmt.Println("Printing parsed message %s", message)
 			broker.ProcessMessage(message)
 		}
-
 	}
 }
 
 func (broker *Broker) GetAllServices() []*service.Service {
 	return broker.services_list
+}
+
+func (broker *Broker) ListAllServices() {
+	for {
+		time.Sleep(10 * time.Second)
+		fmt.Println(broker.GetAllServices())
+	}
 }
 
 func (broker *Broker) Close() error {
@@ -76,7 +83,7 @@ func (broker *Broker) Close() error {
 }
 
 func Start(broker_url string) {
-	broker, err := newBroker(broker_url)
+	broker, err := NewBroker(broker_url)
 
 	if err != nil {
 		fmt.Println("[ERROR]: Broker creation failed.")
@@ -91,6 +98,7 @@ func Start(broker_url string) {
 
 	}
 
+	go broker.ListAllServices()
 	defer broker.Close()
 	fmt.Println(fmt.Sprintf("Starting broker on %s", broker.broker_url))
 	broker.Process()
