@@ -1,6 +1,10 @@
 package broker
 
-import "github.com/supersid/iris/message"
+import (
+	"github.com/supersid/iris/message"
+	"github.com/supersid/iris/service"
+	"fmt"
+)
 
 func(broker *Broker) ClientRequestHandler(msg message.Message){
 	/*
@@ -17,5 +21,25 @@ func(broker *Broker) ClientRequestHandler(msg message.Message){
 	}
 
 	new_service.AddRequest(msg)
-	new_service.ProcessRequests()
+	err, msg, service_worker := new_service.ProcessRequests()
+
+	if err != nil {
+		return
+	}
+
+	broker.ProcessClientRequest(service_worker, msg)
 }
+
+
+func (broker *Broker) ProcessClientRequest(service_worker *service.ServiceWorker,
+				           msg message.Message){
+	client_sender := msg.Sender
+	new_message := make([]string, 5)
+	new_message[0] = service_worker.GetSender()
+	new_message[1] = client_sender
+	new_message[2] = "WORKER_REQUEST_ARRIVED"
+	new_message[3] = msg.Data
+
+	broker.socket.SendMessage(new_message)
+}
+

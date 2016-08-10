@@ -4,6 +4,7 @@ import (
 	"time"
 	"github.com/supersid/iris/message"
 	"fmt"
+	"errors"
 )
 
 type Service struct {
@@ -89,20 +90,26 @@ func (service *Service) AddRequest(msg message.Message){
 	}
 }
 
-func (service *Service) ProcessRequests() {
+func (service *Service) ProcessRequests() (error, message.Message, *ServiceWorker) {
+	var err error
 	if len(service.waiting_workers) <= 0 {
 		fmt.Println("No workers available at the moment")
-		return
+		err = errors.New("No workers available at the moment")
+
 	}
 
 	if len(service.waiting_requests) <= 0 {
 		fmt.Println("No requests available to process at the moment")
-		return
+		err = errors.New("No requests available to process at the moment")
+	}
+
+	if err != nil {
+		return err, message.Message{}, &ServiceWorker{}
 	}
 
 	msg := service.popFirstRequest()
 	service_worker := service.popFirstWorker()
-	service_worker.processJob()
+	return err, msg, service_worker
 
 }
 
@@ -119,10 +126,3 @@ func (service *Service) popFirstWorker() *ServiceWorker{
 	return service_worker
 }
 
-func (service_worker *ServiceWorker) processJob(msg message.Message) {
-	/*
-	TO BE IMPLEMENTED
-
-	This will end up sending a message to the worker.
-	 */
-}
