@@ -9,9 +9,9 @@ import (
 
 type Service struct {
 	name string
-	waiting_workers []*ServiceWorker
-	last_heartbeat  time.Time
-	waiting_requests []message.Message
+	waitingWorkers []*ServiceWorker
+	lastHeartbeat  time.Time
+	waitingRequests []message.Message
 }
 
 type ServiceWorker struct {
@@ -30,8 +30,8 @@ func (service_worker *ServiceWorker) GetSender() string {
 func NewService(name string) (*Service){
 	service := &Service{
 		name:             name,
-		waiting_workers:  make([]*ServiceWorker, 0),
-		waiting_requests: make([]message.Message, 0),
+		waitingWorkers:  make([]*ServiceWorker, 0),
+		waitingRequests: make([]message.Message, 0),
 	}
 	return service
 }
@@ -41,17 +41,17 @@ func (service *Service) GetName() string{
 }
 
 func (service *Service) GetWaitingWorkers() []*ServiceWorker{
-	return service.waiting_workers
+	return service.waitingWorkers
 }
 
 func (service *Service) FindOrCreateServiceWorker(identity string, sender string) (bool, *ServiceWorker) {
 	var service_worker *ServiceWorker
 	var worker_exists bool = false
 
-	for i := 0; i < len(service.waiting_workers); i++ {
-		if service.waiting_workers[i].identity == identity {
+	for i := 0; i < len(service.waitingWorkers); i++ {
+		if service.waitingWorkers[i].identity == identity {
 			worker_exists = true
-			service_worker = service.waiting_workers[i]
+			service_worker = service.waitingWorkers[i]
 			break;
 		}
 	}
@@ -68,7 +68,7 @@ func (service *Service) FindOrCreateServiceWorker(identity string, sender string
 
 
 func (service *Service) AddWorker(service_worker *ServiceWorker) {
-	service.waiting_workers = append(service.waiting_workers, service_worker)
+	service.waitingWorkers = append(service.waitingWorkers, service_worker)
 }
 
 /*
@@ -78,7 +78,7 @@ same message Id is not already present.
 func (service *Service) AddRequest(msg message.Message){
 	message_exists := false
 
-	for _, request := range service.waiting_requests {
+	for _, request := range service.waitingRequests {
 		if request.MessageId == msg.MessageId {
 			message_exists = true
 			break;
@@ -86,19 +86,19 @@ func (service *Service) AddRequest(msg message.Message){
 	}
 
 	if !message_exists {
-		service.waiting_requests = append(service.waiting_requests, msg)
+		service.waitingRequests = append(service.waitingRequests, msg)
 	}
 }
 
 func (service *Service) ProcessRequests() (error, message.Message, *ServiceWorker) {
 	var err error
-	if len(service.waiting_workers) <= 0 {
+	if len(service.waitingWorkers) <= 0 {
 		fmt.Println("No workers available at the moment")
 		err = errors.New("No workers available at the moment")
 
 	}
 
-	if len(service.waiting_requests) <= 0 {
+	if len(service.waitingRequests) <= 0 {
 		fmt.Println("No requests available to process at the moment")
 		err = errors.New("No requests available to process at the moment")
 	}
@@ -115,14 +115,14 @@ func (service *Service) ProcessRequests() (error, message.Message, *ServiceWorke
 
 
 func (service *Service) popFirstRequest() message.Message {
-	request := service.waiting_requests[0]
-	service.waiting_requests = service.waiting_requests[1:]
+	request := service.waitingRequests[0]
+	service.waitingRequests = service.waitingRequests[1:]
 	return request
 }
 
 func (service *Service) popFirstWorker() *ServiceWorker{
-	service_worker := service.waiting_workers[0]
-	service.waiting_workers = service.waiting_workers[1:]
+	service_worker := service.waitingWorkers[0]
+	service.waitingWorkers = service.waitingWorkers[1:]
 	return service_worker
 }
 

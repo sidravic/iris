@@ -15,11 +15,11 @@ const POLL_FREQUENCY = 250 * time.Millisecond
 
 type Broker struct {
 	socket          *zmq.Socket
-	broker_url      string
+	brokerUrl       string
 	services        map[string]*service.Service
 	workers         map[string]*service.ServiceWorker
-	services_list   []*service.Service
-	waiting_workers []*worker.Worker
+	servicesList   []*service.Service
+	waitingWorkers []*worker.Worker
 }
 
 /*
@@ -27,10 +27,10 @@ type Broker struct {
  */
 func NewBroker(broker_url string) (*Broker, error) {
 	broker := &Broker{
-		broker_url:      broker_url,
+		brokerUrl:       broker_url,
 		services:        make(map[string]*service.Service),
 		workers:         make(map[string]*service.ServiceWorker),
-		waiting_workers: make([]*worker.Worker,0),
+		waitingWorkers:  make([]*worker.Worker,0),
 	}
 
 	socket, err := zmq.NewSocket(zmq.ROUTER)
@@ -68,7 +68,7 @@ func (broker *Broker) Process() {
 }
 
 func (broker *Broker) GetAllServices() []*service.Service {
-	return broker.services_list
+	return broker.servicesList
 }
 
 func (broker *Broker) ListAllServices() {
@@ -103,7 +103,7 @@ func Start(broker_url string) {
 
 	go broker.ListAllServices()
 	defer broker.Close()
-	fmt.Println(fmt.Sprintf("Starting broker on %s", broker.broker_url))
+	fmt.Println(fmt.Sprintf("Starting broker on %s", broker.brokerUrl))
 	broker.Process()
 }
 

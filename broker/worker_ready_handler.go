@@ -15,21 +15,21 @@ import (
  5. Add the worker to the broker.
  */
 func (broker *Broker) WorkerReadyHandler(msg message.Message) {
-	new_service, already_present := broker.FindOrCreateService(msg.ServiceName)
+	newService, alreadyPresent := broker.FindOrCreateService(msg.ServiceName)
 
-	if !already_present {
-		broker.AddService(new_service)
+	if !alreadyPresent {
+		broker.AddService(newService)
 	}
 
-	worker_existed, service_worker := new_service.FindOrCreateServiceWorker(msg.Identity, msg.Sender)
+	workerExisted, serviceWorker := newService.FindOrCreateServiceWorker(msg.Identity, msg.Sender)
 
-	if !worker_existed {
+	if !workerExisted {
 		fmt.Println("Adding service worker")
-		new_service.AddWorker(service_worker)
-		broker.addWorker(new_service, service_worker)
+		newService.AddWorker(serviceWorker)
+		broker.addWorker(newService, serviceWorker)
 	}
 
-	for index, w := range new_service.GetWaitingWorkers() {
+	for index, w := range newService.GetWaitingWorkers() {
 		fmt.Println(fmt.Sprintf("%d. %s", index, w.GetIdentity()))
 	}
 }
@@ -37,7 +37,7 @@ func (broker *Broker) WorkerReadyHandler(msg message.Message) {
 func (broker *Broker) AddService(service *service.Service) {
 	service_name := service.GetName()
 	broker.services[service_name] = service
-	broker.services_list = append(broker.services_list, service)
+	broker.servicesList = append(broker.servicesList, service)
 }
 
 func (broker *Broker) addWorker(service *service.Service,

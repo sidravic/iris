@@ -15,32 +15,32 @@ func(broker *Broker) ClientRequestHandler(msg message.Message){
 	3. Assign requests to waiting requests queue
 	4.
 	*/
-	new_service, already_present := broker.FindOrCreateService(msg.ServiceName)
+	newService, alreadyPresent := broker.FindOrCreateService(msg.ServiceName)
 
-	if !already_present {
-		broker.AddService(new_service)
+	if !alreadyPresent {
+		broker.AddService(newService)
 	}
 
-	new_service.AddRequest(msg)
-	err, msg, service_worker := new_service.ProcessRequests()
+	newService.AddRequest(msg)
+	err, msg, serviceWorker := newService.ProcessRequests()
 
 	if err != nil {
 		return
 	}
 
-	broker.ProcessClientRequest(service_worker, msg)
+	broker.ProcessClientRequest(serviceWorker, msg)
 }
 
 
-func (broker *Broker) ProcessClientRequest(service_worker *service.ServiceWorker,
+func (broker *Broker) ProcessClientRequest(serviceWorker *service.ServiceWorker,
 				           msg message.Message){
-	client_sender := msg.Sender
-	new_message := make([]string, 5)
-	new_message[0] = service_worker.GetSender()
-	new_message[1] = client_sender
-	new_message[2] = WORKER_REQUEST
-	new_message[3] = msg.Data
+	clientSender := msg.Sender
+	newMessage := make([]string, 5)
+	newMessage[0] = serviceWorker.GetSender()
+	newMessage[1] = clientSender
+	newMessage[2] = WORKER_REQUEST
+	newMessage[3] = msg.Data
 
-	broker.socket.SendMessage(new_message)
+	broker.socket.SendMessage(newMessage)
 }
 

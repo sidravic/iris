@@ -50,11 +50,11 @@ func (broker *Broker) ProcessMessage(msg message.Message) {
 
 }
 
-func (broker *Broker) FindOrCreateService(service_name string) (*service.Service, bool) {
-	srvc, present := broker.services[service_name]
+func (broker *Broker) FindOrCreateService(serviceName string) (*service.Service, bool) {
+	srvc, present := broker.services[serviceName]
 
 	if !present {
-		srvc = service.NewService(service_name)
+		srvc = service.NewService(serviceName)
 	}
 
 	return srvc, present

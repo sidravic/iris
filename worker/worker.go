@@ -12,7 +12,6 @@ import (
 	"fmt"
 	zmq "github.com/pebbe/zmq4"
 	uuid "github.com/satori/go.uuid"
-//	"github.com/supersid/iris/message"
 )
 
 const (
@@ -23,8 +22,8 @@ const (
 type Worker struct {
 	socket       *zmq.Socket
 	identity     string
-	service_name string
-	broker_url   string
+	serviceName string
+	brokerUrl   string
 }
 
 type WorkerMessage struct {
@@ -38,16 +37,16 @@ func (worker *Worker) createMessage(command string) []string {
 	msg := make([]string, 5)
 	msg[0] = ""
 	msg[1] = command
-	msg[2] = worker.service_name
+	msg[2] = worker.serviceName
 	msg[3] = worker.identity
 
 	return msg
 }
 
-func newWorker(broker_url, service_name string) (*Worker, error) {
+func newWorker(brokerUrl, serviceName string) (*Worker, error) {
 	worker := &Worker{
-		broker_url:   broker_url,
-		service_name: service_name,
+		brokerUrl:   brokerUrl,
+		serviceName: serviceName,
 	}
 
 	socket, err := zmq.NewSocket(zmq.DEALER)
@@ -134,7 +133,7 @@ func Start(broker_url, service_name string) (*Worker, chan WorkerMessage) {
 		panic(err)
 	}
 
-	fmt.Println(fmt.Sprintf("Starting worker id %s by connecting to %s", worker.identity, worker.broker_url))
+	fmt.Println(fmt.Sprintf("Starting worker id %s by connecting to %s", worker.identity, worker.brokerUrl))
 	m := make(chan WorkerMessage)
 	go worker.Process(m)
 	return worker, m

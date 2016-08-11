@@ -1,6 +1,5 @@
 package main
 
-import ()
 import (
 	"github.com/supersid/iris/worker"
 	"fmt"
