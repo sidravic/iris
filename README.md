@@ -1,7 +1,7 @@
 # IRIS
 
 Iris is a service discovery and load balancing library built on top of 
-ZMQ. It uses the Majordomo Patter to build a basic DEALER-ROUTER-DEALER
+ZMQ. It uses the Majordomo Pattern to build a basic DEALER-ROUTER-DEALER
  pattern. 
  
 It does not adhere to the exact protocol specified in the zmq specifications 
