@@ -7,6 +7,7 @@ import (
 	"time"
 	"fmt"
 	"github.com/supersid/iris/message"
+	"runtime"
 )
 
 const POLL_FREQUENCY = 250 * time.Millisecond
@@ -83,6 +84,8 @@ func (broker *Broker) Close() error {
 }
 
 func Start(broker_url string) {
+	runtime.GOMAXPROCS(runtime.NumCPU())
+
 	broker, err := NewBroker(broker_url)
 
 	if err != nil {

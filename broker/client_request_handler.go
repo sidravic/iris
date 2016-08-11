@@ -3,8 +3,9 @@ package broker
 import (
 	"github.com/supersid/iris/message"
 	"github.com/supersid/iris/service"
-	"fmt"
 )
+
+const WORKER_REQUEST = "WORKER_REQUEST"
 
 func(broker *Broker) ClientRequestHandler(msg message.Message){
 	/*
@@ -37,7 +38,7 @@ func (broker *Broker) ProcessClientRequest(service_worker *service.ServiceWorker
 	new_message := make([]string, 5)
 	new_message[0] = service_worker.GetSender()
 	new_message[1] = client_sender
-	new_message[2] = "WORKER_REQUEST_ARRIVED"
+	new_message[2] = WORKER_REQUEST
 	new_message[3] = msg.Data
 
 	broker.socket.SendMessage(new_message)
