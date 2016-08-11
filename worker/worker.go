@@ -90,11 +90,11 @@ func (worker *Worker) wrapMessage(recv_msg []string) WorkerMessage{
 
 func (worker *Worker) unwrapMessage(m WorkerMessage) []string {
 	new_message   := make([]string, 5)
-	new_message[0] = ""
-	new_message[1] = m.sender
-	new_message[2] = WORKER_RESPONSE
-	new_message[3] = m.RequestMessage
-	new_message[4] = m.ResponseMessage
+	new_message[0] = m.sender
+	new_message[1] = WORKER_RESPONSE
+	new_message[2] = m.RequestMessage
+	new_message[3] = m.ResponseMessage
+	new_message[4] = worker.identity
 	return new_message
 }
 

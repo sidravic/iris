@@ -7,7 +7,6 @@ type Message struct {
 	Data         string
 	ServiceName  string
 	MessageId    string
+	ResponseData string
 }
-
-
 

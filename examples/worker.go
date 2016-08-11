@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/supersid/iris/worker"
 	"fmt"
+	"time"
 )
 
 func main() {
@@ -16,7 +17,7 @@ func main() {
 
 		msg := <- c
 		fmt.Println(fmt.Sprintf("%s", msg.RequestMessage))
-		msg.ResponseMessage = "The answer is 42."
+		msg.ResponseMessage = fmt.Sprintf("The answer is %s", time.Now())
 		w.SendMessage(msg)
 	}
 

@@ -53,12 +53,12 @@ func (broker *Broker) Process() {
 
 	for {
 		fmt.Println("Polling...")
-		incoming_sockets, err := poller.Poll(POLL_FREQUENCY)
+		incomingSockets, err := poller.Poll(POLL_FREQUENCY)
 		if err != nil {
 			fmt.Println(err)
 		}
 
-		if len(incoming_sockets) > 0 {
+		if len(incomingSockets) > 0 {
 			msg, _ := broker.socket.RecvMessage(0)
 			var message message.Message = broker.ParseMessage(msg)
 			fmt.Println("Printing parsed message %s", message)

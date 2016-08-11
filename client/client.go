@@ -13,8 +13,9 @@ const (
 
 type Client struct {
 	socket *zmq.Socket
-	brokerUrl string
+	brokerUrl  string
 	identity   string
+	poller     *zmq.Poller
 }
 
 func (client *Client) setIdentity() {
@@ -35,11 +36,30 @@ func newClient(brokerUrl string) (*Client, error) {
 
 	client.socket = socket
 	client.setIdentity()
+
+	client.poller = zmq.NewPoller()
+	client.poller.Add(client.socket, zmq.POLLIN)
+
 	return client, err
 }
 
 func (client *Client) Close() {
 	client.socket.Close()
+}
+
+func (client *Client) ReceiveMessage() (error, []string){
+	_, err := client.poller.Poll(-1)
+
+	if err != nil {
+		return err, make([]string,0)
+	}
+
+	msg, err2 := client.socket.RecvMessage(0)
+	if err2 != nil {
+		return err2, make([]string, 0)
+	}
+
+	return nil, msg
 }
 
 /*

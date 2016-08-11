@@ -6,6 +6,7 @@ import (
 	"github.com/supersid/iris/client"
 	"github.com/supersid/iris/message"
 	"github.com/satori/go.uuid"
+	"github.com/supersid/iris/worker"
 )
 
 /*
@@ -33,6 +34,16 @@ func (broker *Broker) ParseMessage(msg []string) message.Message {
 			Data:         msg[5],
 			MessageId:    uuid.NewV4().String(),
 		}
+	} else if command == worker.WORKER_RESPONSE {
+		fmt.Println("WORKER RESPONSE arrived. Yaay!!")
+		m = message.Message{
+			Sender:       msg[1],
+			Command:      command,
+			Data:  	      msg[3],
+			ResponseData: msg[4],
+			Identity:     msg[5],
+			MessageId:    uuid.NewV4().String(),
+		}
 	} else {
 		m = message.Message{}
 	}
@@ -46,6 +57,9 @@ func (broker *Broker) ProcessMessage(msg message.Message) {
 	} else if msg.Command == client.CLIENT_REQUEST {
 		fmt.Println("Client Request arrived.")
 		broker.ClientRequestHandler(msg)
+	} else if msg.Command == worker.WORKER_RESPONSE {
+		fmt.Println("Worker response arrived.")
+		broker.WorkerResponseHandler(msg)
 	}
 
 }
