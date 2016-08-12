@@ -88,7 +88,7 @@ func (client *Client) SendMessage(serviceName, message string) error{
 
 	msg := client.createMessage(serviceName, message)
 	fmt.Println(fmt.Sprintf("Sending %s: to service %s", message, serviceName))
-	fmt.Println(fmt.Sprintf("Encoded message :%s", msg))
+
 	_, err := client.socket.SendMessage(msg)
 
 	return err

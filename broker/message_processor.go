@@ -22,6 +22,10 @@ func (broker *Broker) ParseMessage(msg []string) message.Message {
 		fmt.Println(fmt.Sprintf("%d. %s", index, message))
 	}
 
+	if len(msg) < 4 {
+		return message.Message{}
+	}
+
 	command := msg[2]
 	sender  := msg[0]
 
