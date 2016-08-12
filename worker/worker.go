@@ -12,6 +12,7 @@ import (
 	"fmt"
 	zmq "github.com/pebbe/zmq4"
 	uuid "github.com/satori/go.uuid"
+	"time"
 )
 
 const (
@@ -24,6 +25,7 @@ type Worker struct {
 	identity     string
 	serviceName string
 	brokerUrl   string
+	poller 	    *zmq.Poller
 }
 
 type WorkerMessage struct {
@@ -60,6 +62,7 @@ func newWorker(brokerUrl, serviceName string) (*Worker, error) {
 	worker.identity = uuid.NewV4().String()
 	poller := zmq.NewPoller()
 	poller.Add(worker.socket, zmq.POLLIN)
+	worker.poller = poller
 
 	return worker, err
 }
@@ -105,6 +108,18 @@ func (worker *Worker) Process(m chan WorkerMessage) {
 		if err != nil {
 			fmt.Println("[ERROR]: Unable to send worker ready message: %s", err.Error())
 			fmt.Println(msg)
+		}
+		sockets, err2 :=  worker.poller.Poll(250 * time.Millisecond)
+
+		if err2 != nil {
+			fmt.Println("[ERROR]: Unable to send worker ready message: %s", err2.Error())
+			fmt.Println(err2.Error())
+			continue
+		}
+
+		if len(sockets) == 0 {
+			fmt.Println("No new event")
+			continue
 		}
 
 		received_msg, err := worker.socket.RecvMessage(0)
