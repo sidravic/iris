@@ -3,13 +3,19 @@ package main
 import (
 	"github.com/supersid/iris/client"
 	"fmt"
+
 	"time"
 )
 
 func SendMessages(_client *client.Client){
+	seq := 0
+
 	for {
-		fmt.Println(_client.SendMessage("echo", "Hello World"))
-		time.Sleep(2 * time.Second)
+		seq++
+		msg := fmt.Sprintf("Hello %d", seq)
+		fmt.Println(_client.SendMessage("echo", msg))
+		time.Sleep(250 * time.Millisecond)
+		fmt.Println(seq)
 	}
 }
 
@@ -19,8 +25,11 @@ func main() {
 	go SendMessages(_client)
 
 	for {
-		_, msg := _client.ReceiveMessage()
+		err, msg := _client.ReceiveMessage()
+		fmt.Println("------------------------")
+		fmt.Println(err)
 		fmt.Println(msg)
+		fmt.Println("------------------------")
 	}
 
 
