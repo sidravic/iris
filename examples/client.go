@@ -3,34 +3,56 @@ package main
 import (
 	"github.com/supersid/iris/client"
 	"fmt"
-
-	"time"
 )
 
-func SendMessages(_client *client.Client){
-	seq := 0
 
-	for {
-		seq++
-		msg := fmt.Sprintf("Hello %d", seq)
-		fmt.Println(_client.SendMessage("echo", msg))
-		time.Sleep(250 * time.Millisecond)
-		fmt.Println(seq)
-	}
+func SendMessage(c *client.Client, msg string){
+	c.SendMessage("echo", msg)
 }
+
+
 
 func main() {
 
-	_client := client.Start("tcp://127.0.0.1:5555")
-	go SendMessages(_client)
 
+	_c := client.Start("tcp://127.0.0.1:5555")
+
+
+
+
+
+	retry_count := 0
+        seq := 1
 	for {
-		err, msg := _client.ReceiveMessage()
+		msg := fmt.Sprintf("Hello %d", seq)
+		SendMessage(_c, msg)
+
+		err, m := _c.ReceiveMessage()
+
+		if err != nil {
+			break;
+		}
+
+		if len(m) == 0 {
+			SendMessage(_c, msg)
+			if retry_count == 3 {
+				seq++
+				continue
+			}else{
+				retry_count++
+				continue
+			}
+
+
+		}
+
 		fmt.Println("------------------------")
-		fmt.Println(err)
-		fmt.Println(msg)
+		fmt.Println(m)
 		fmt.Println("------------------------")
+		seq++
 	}
+
+
 
 
 

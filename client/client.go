@@ -5,6 +5,7 @@ import (
 	zmq "github.com/pebbe/zmq4"
 	"errors"
 	"fmt"
+	"time"
 )
 
 const (
@@ -48,12 +49,16 @@ func (client *Client) Close() {
 }
 
 func (client *Client) ReceiveMessage() (error, []string){
-	_, err := client.poller.Poll(-1)
+	sockets, err := client.poller.Poll(3 * time.Second)
 
+	if len(sockets) == 0 {
+		return err, make([]string, 0)
+	}
 	if err != nil {
 		return err, make([]string,0)
 	}
 
+	fmt.Println("Waiting on a response.")
 	msg, err2 := client.socket.RecvMessage(0)
 	if err2 != nil {
 		return err2, make([]string, 0)
