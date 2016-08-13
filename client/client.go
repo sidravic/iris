@@ -49,7 +49,7 @@ func (client *Client) Close() {
 }
 
 func (client *Client) ReceiveMessage() (error, []string){
-	sockets, err := client.poller.Poll(3 * time.Second)
+	sockets, err := client.poller.Poll(300 * time.Millisecond)
 
 	if len(sockets) == 0 {
 		return err, make([]string, 0)

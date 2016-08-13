@@ -33,13 +33,16 @@ func main() {
 			break;
 		}
 
+
 		if len(m) == 0 {
 			SendMessage(_c, msg)
-			if retry_count == 3 {
+			if retry_count == 1000 {
+				fmt.Println("Giving up")
 				seq++
 				continue
 			}else{
 				retry_count++
+				fmt.Println("Retyring...")
 				continue
 			}
 
