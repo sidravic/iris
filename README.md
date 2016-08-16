@@ -14,7 +14,7 @@ Basic examples are available in the `examples` directory.
 After pulling dependencies using Godep and installing Zeromq 4.1 launch each of the components
 on separate terminals
 
-1. `go run examples/broker.go`
+1. `go run examples/main.go`
 2. `go run examples/client.go`
 3. `go run examples/worker.go`
 4. `go run examples/worker.go`
